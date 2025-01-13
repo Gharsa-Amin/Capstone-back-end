@@ -13,6 +13,7 @@ app.use(express.json());
 const db = knex(knexfile);
 
 const apiKey = "8014a7dd-5ae4-459a-8a81-2bf5fdfb2cad";
+//proxy access, middleman..
 app.get("/api/btc", async (req, res) => {
 	const url =
 		"https://pro-api.coinmarketcap.com/v2/cryptocurrency/info?symbol=BTC";

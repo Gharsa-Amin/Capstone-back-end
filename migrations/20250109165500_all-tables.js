@@ -17,10 +17,14 @@ export function up(knex) {
 				.inTable("users")
 				.onDelete("CASCADE");
 			table.string("net_worth").notNullable();
-			table.string("trading_comfort").notNullable();
-			table.string("experience").notNullable();
-			table.json("interests");
-			table.json("top_assets").notNullable();
+			table.string("risk_tolerance").notNullable();
+			table.string("trading_experience").notNullable();
+			table.json("products").notNullable();
+			table.json("top_crypto_coins").notNullable();
+			table.string("current_occupation").notNullable();
+			table.string("scammed_before").notNullable();
+			table.string("someone_helping").notNullable();
+			table.string("shared_access").notNullable();
 			table.timestamps(true, true);
 		})
 		.createTable("complaints", (table) => {

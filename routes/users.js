@@ -46,6 +46,7 @@ router.post("/register", async (req, res) => {
 });
 
 router.post("/onboarding", async (req, res) => {
+	console.log(req.body);
 	// if (
 	// 	!req.body.name ||
 	// 	!req.body.phonenumber ||
@@ -56,20 +57,30 @@ router.post("/onboarding", async (req, res) => {
 	// 		msg: "You must provide a name, phonenumber, email and password",
 	// 	});
 	// }
-	// try {
-	// 	// Create a new user in the database
-	// 	const newUserIds = await db("users").insert({
-	// 		name: req.body.name,
-	// 		email: req.body.email,
-	// 		phonenumber: req.body.phonenumber,
-	// 		password: hashedPassword,
-	// 	});
-	// 	// Retrieve the new user and send it in the response
-	// 	const newUser = await db("users").where({ id: newUserIds[0] }).first();
-	// 	res.status(201).json(newUser);
-	// } catch (error) {
-	// 	res.status(500).json({ msg: `Couldn't create new user: ${error.message}` });
-	// }
+	try {
+		// Create a new user profile in the database
+		const newUserProfileIds = await db("user_profile").insert({
+			user_id: 1, //To Do making this dynamic...
+			net_worth: req.body.networth,
+			risk_tolerance: req.body.risk_tolerance,
+			trading_experience: req.body.trading_experience,
+			products: JSON.stringify(req.body.products),
+			top_crypto_coins: JSON.stringify(req.body.top_crypto_coins),
+			current_occupation: req.body.current_occupation,
+			scammed_before: req.body.scammed_before,
+			someone_helping: req.body.someone_helping,
+			shared_access: req.body.shared_access,
+		});
+		// Retrieve the new user profile and send it in the response
+		const newUserProfile = await db("user_profile")
+			.where({ id: newUserProfileIds[0] })
+			.first();
+		res.status(201).json(newUserProfile);
+	} catch (error) {
+		res
+			.status(500)
+			.json({ msg: `Couldn't create new user profile: ${error.message}` });
+	}
 });
 
 // router.post("/login", async (req, res) => {
