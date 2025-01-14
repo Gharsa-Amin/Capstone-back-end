@@ -26,7 +26,9 @@ router.post("/register", async (req, res) => {
 			msg: "You must provide a name, phonenumber, email and password",
 		});
 	}
-	const existingUser = await db("users").where({ email }).first();
+	const existingUser = await db("users")
+		.where({ email: req.body.email })
+		.first();
 	if (existingUser) {
 		return res.status(400).json({
 			msg: "Email already in use. Please use a different email address.",
@@ -52,7 +54,7 @@ router.post("/register", async (req, res) => {
 	}
 });
 
-router.post("/onboarding", async (req, res) => {
+router.post("/onboarding", authorise, async (req, res) => {
 	console.log(req.body);
 	if (
 		!req.body.networth ||
@@ -72,7 +74,7 @@ router.post("/onboarding", async (req, res) => {
 	try {
 		// Create a new user profile in the database
 		const newUserProfileIds = await db("user_profile").insert({
-			user_id: 1, //To Do making this dynamic...
+			user_id: req.token.id, //To Do making this dynamic...
 			net_worth: req.body.networth,
 			risk_tolerance: req.body.risk_tolerance,
 			trading_experience: req.body.trading_experience,
@@ -103,37 +105,77 @@ router.post("/login", async (req, res) => {
 	}
 
 	try {
-		const user = await knex("user").where({ email: req.body.email }).first();
-		const result = await bcrypt.compare(req.body.password, user.password);
-		if (!result) {
-			return res
-				.status(403)
-				.json({ message: "Username/Password combination is not correct" });
+		// Correct query to 'users' table
+		const user = await db("users").where({ email: req.body.email }).first();
+		if (!user) {
+			return res.status(400).json({ message: "User not found" });
 		}
 
+		// Check if password matches
+		const result = await bcrypt.compare(req.body.password, user.password);
+		if (!result) {
+			return res.status(403).json({
+				message: "Username/Password combination is not correct",
+			});
+		}
+
+		// Generate JWT token
 		const token = jwt.sign(
 			{
 				id: user.id,
 				sub: user.email,
 			},
-			process.env.JWT_SECRE,
+			process.env.JWT_SECRET,
 			{ expiresIn: "8h" }
 		);
 		res.json({ authToken: token });
 	} catch (error) {
-		res.status(400).json({ message: "User not found" });
+		res.status(500).json({ message: "Login failed: " + error.message });
 	}
 });
 
+// router.get("/profile", authorise, async (req, res) => {
+// 	try {
+// 		// The `authorise` middleware added the decoded token to `req.token` so we have the users ID from the JWT token.
+// 		// Query the DB for a user with that ID.
+
+// 		const user = await db("users").where({ id: req.token.id }).first();
+// 		console.log(user);
+// 		res.json(user);
+// 	} catch (error) {
+// 		res.status(500).json({ message: "Can't fetch user profile" });
+// 	}
+// });
+
 router.get("/profile", authorise, async (req, res) => {
 	try {
-		// The `authorise` middleware added the decoded token to `req.token` so we have the users ID from the JWT token.
-		// Query the DB for a user with that ID.
-		const user = await knex("users").where({ id: req.token.id }).first();
+		// Query the `users` table and join with `user_profile`
+		const userProfile = await db("users")
+			.join("user_profile", "users.id", "user_profile.user_id")
+			.where({ "users.id": req.token.id })
+			.select(
+				"users.id",
+				"users.name",
+				"users.email",
+				"users.phonenumber",
+				"user_profile.net_worth",
+				"user_profile.risk_tolerance",
+				"user_profile.trading_experience",
+				"user_profile.products",
+				"user_profile.top_crypto_coins",
+				"user_profile.current_occupation"
+			)
+			.first(); // Since `user_id` is unique, `.first()` will return the user profile as a single object
 
-		res.json(user);
+		if (!userProfile) {
+			return res.status(404).json({ message: "User profile not found" });
+		}
+
+		res.json(userProfile);
 	} catch (error) {
-		res.status(500).json({ message: "Can't fetch user profile" });
+		res
+			.status(500)
+			.json({ message: "Can't fetch user profile", error: error.message });
 	}
 });
 
