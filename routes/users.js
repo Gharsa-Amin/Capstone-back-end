@@ -9,6 +9,8 @@ const router = express.Router();
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
+import authorise from "../middleware/auth.js";
+
 // Used for hashing the password
 const SALT_ROUNDS = 8;
 
@@ -24,7 +26,12 @@ router.post("/register", async (req, res) => {
 			msg: "You must provide a name, phonenumber, email and password",
 		});
 	}
-
+	const existingUser = await db("users").where({ email }).first();
+	if (existingUser) {
+		return res.status(400).json({
+			msg: "Email already in use. Please use a different email address.",
+		});
+	}
 	try {
 		// Hash the password before saving
 		const hashedPassword = await bcrypt.hash(req.body.password, SALT_ROUNDS);

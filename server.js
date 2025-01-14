@@ -8,7 +8,7 @@ import usersRouter from "./routes/users.js";
 import complaintsRouter from "./routes/complaints.js";
 const PORT = process.env.PORT || 8080;
 const app = express();
-app.use(cors());
+app.use(cors({ origin: process.env.CLIENT_URL }));
 app.use(express.json());
 const db = knex(knexfile);
 
@@ -52,7 +52,7 @@ app.get("/api/btc", async (req, res) => {
 		}
 	}
 });
-app.use("/api", usersRouter);
+app.use("/api/users", usersRouter);
 app.use("/complaints", complaintsRouter);
 app.listen(PORT, () => {
 	console.log(`Server is running at port ${PORT}`);
