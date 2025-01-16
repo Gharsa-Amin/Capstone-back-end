@@ -134,19 +134,6 @@ router.post("/login", async (req, res) => {
 	}
 });
 
-// router.get("/profile", authorise, async (req, res) => {
-// 	try {
-// 		// The `authorise` middleware added the decoded token to `req.token` so we have the users ID from the JWT token.
-// 		// Query the DB for a user with that ID.
-
-// 		const user = await db("users").where({ id: req.token.id }).first();
-// 		console.log(user);
-// 		res.json(user);
-// 	} catch (error) {
-// 		res.status(500).json({ message: "Can't fetch user profile" });
-// 	}
-// });
-
 router.get("/profile", authorise, async (req, res) => {
 	try {
 		// Query the `users` table and join with `user_profile`
