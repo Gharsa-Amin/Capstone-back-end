@@ -25,6 +25,7 @@ export function up(knex) {
 			table.string("scammed_before").notNullable();
 			table.string("someone_helping").notNullable();
 			table.string("shared_access").notNullable();
+			// table.boolean("hasOnboarded").defaultTo(true);
 			table.timestamps(true, true);
 		})
 		.createTable("complaints", (table) => {

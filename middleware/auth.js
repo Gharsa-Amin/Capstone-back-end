@@ -1,4 +1,4 @@
-import "dotevn/config";
+import "dotenv/config";
 import jwt from "jsonwebtoken";
 const JWT_SECRET = process.env.JWT_SECRET;
 const authorise = async (req, res, next) => {
