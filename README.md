@@ -1,4 +1,4 @@
-# **Project Title: Blockchain Hub**
+# **Project Title: Blockchain Hub (GD Chain)**
 
 ---
 
