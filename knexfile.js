@@ -7,13 +7,13 @@ export default {
 		host: process.env.DB_HOST,
 		user: process.env.DB_USER,
 		password: process.env.DB_PASSWORD,
-		database: "userOnboard", // Ensure this matches your DB
+		database: "userOnboard",
 		charset: "utf8",
 	},
 	migrations: {
-		directory: "./migrations", // Path to your migrations
+		directory: "./migrations",
 	},
 	seeds: {
-		directory: "./seeds", // Optional if you have seed data
+		directory: "./seeds",
 	},
 };
